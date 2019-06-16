@@ -26,14 +26,33 @@ template<class T>
     Vector() : _start(nullptr), _finish(nullptr), _endOfStorage(nullptr){}
 
 
-    ~Vector(){}
+    ~Vector(){
+      if (_start){
+        delete[] _start;
+        _start = _finish = _endOfStorage = nullptr;
+      }
+    }
+
 
     //Vector v1(v2);
-    Vector(const Vector<T>& v){}
+    Vector(const Vector<T>& v) : _start(nullptr), _finish(nullptr), _endOfStorage(nullptr){
+      Reverse(v.Size());
+      for (size_t i = 0; i < v.Size(); i++){
+        this->push_back(v[i]);
+      }
+    }
 
     // v1 = v2
-    Vector<T>& operator=(Vector<T> v){}
-    
+    Vector<T>& operator=(Vector<T> v){
+      Swap(v);    
+      return *this;
+    }
+
+    void Swap(Vector<T>& v){
+      std::swap(_start, v._start);
+      std::swap(_finish, v._finish);
+      std::swap(_endOfStorage, v._endOfStorage);
+    }
   public:
     T& operator[](size_t pos){
       assert(pos < Size());
@@ -67,6 +86,18 @@ template<class T>
       --_finish;
     }
 
+    void Resize(int n, const T& x = T()){
+      if (n <= Size()){
+        _finish = _start + n;
+      }else {
+        Reverse(n);
+        while(_finish != _start + n){
+          *_finish = x;
+          _finish++;
+        }
+      }
+    }
+
     void Reverse(int n){
       if (n > Capacity()){
         T* tmp = new T[n];
@@ -84,7 +115,34 @@ template<class T>
       }
     }
 
-    iterator Insert(iterator pos, const T& x){
+    void Insert(iterator pos, const T& x){
+      assert(pos <= _finish);
+      if (_finish == _endOfStorage){
+        size_t n = pos - _start;
+        size_t newCapacity = Capacity() == 0 ? 4 : 2 * Capacity();
+        Reverse(newCapacity);
+        pos = _start + n;
+      }
+
+      iterator begin = _finish;
+      while(begin != pos){
+        *begin = *(begin - 1);
+        begin--;
+      }
+
+      *pos = x;
+      ++_finish;
+    }
+
+    iterator earse(iterator pos){
+      assert(pos < _finish);
+      iterator begin = pos;
+      while(begin != _finish - 1){
+        *begin = *(begin + 1);
+        ++begin;
+      }
+      --_finish;
+      return pos;
     }
   private:
     iterator _start;   // 指向数据起始
