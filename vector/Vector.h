@@ -72,7 +72,7 @@ template<class T>
       return _endOfStorage - _start;
     }
 
-    void push_back(const T& x){
+    void Push_Back(const T& x){
       if (_finish == _endOfStorage){
         int newCapacity = Capacity() == 0 ? 4 : 2 * Capacity();
         Reverse(newCapacity);
@@ -81,7 +81,7 @@ template<class T>
       ++_finish;
     }
 
-    void pop_back() {
+    void Pop_Back() {
       assert(_finish > _start);
       --_finish;
     }
